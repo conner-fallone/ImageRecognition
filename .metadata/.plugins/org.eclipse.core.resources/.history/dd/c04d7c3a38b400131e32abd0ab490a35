@@ -1,0 +1,14 @@
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.objdetect.CascadeClassifier;
+
+public class Hello{
+	
+	private CascadeClassifier ball_cascade;
+	
+	public static void main(String[] args){
+		
+	}
+	
+}
