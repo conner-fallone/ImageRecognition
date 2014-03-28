@@ -48,9 +48,10 @@ public class BallTracking {
 		Mat videoImage = new Mat();
 		Mat grey = new Mat();
 		Mat circles = new Mat();
+		Mat permanent = new Mat();
 		
 		// Stream from .avi
-		// VideoCapture stream = new VideoCapture(videoPath);
+		// VideoCapture stream = new VideoCapture();
 		
 		// Stream with webcam
 		VideoCapture stream = new VideoCapture(0);
@@ -59,7 +60,7 @@ public class BallTracking {
 			while (true){
 				stream.read(videoImage);		
 				if(!videoImage.empty()){
-		           frame.setSize(grey.width()+40,grey.height()+60);
+		           frame.setSize(videoImage.width()+40,videoImage.height()+60);
 		           
 		           // Convert to grayscale
 		           Imgproc.cvtColor(videoImage, grey, Imgproc.COLOR_RGB2GRAY);
@@ -81,12 +82,14 @@ public class BallTracking {
 		        	   int radius = (int)Math.round(vCircle[2]);
 		        	   
 		        	   // Draw the found circle
-		        	   Core.circle(grey, center, radius, redColor, 2);
+		        	   Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
+		        	   
+		        	   // Draw the center of circle
+		        	   Core.circle(videoImage, center, 3, redColor, -1, 8, 0 );
 		           }
 		           
 		           // Paint the image to the panel
-		           panel.matToBufferedImage(grey);
-		           //panel.matToBufferedImage(videoImage);
+		           panel.matToBufferedImage(videoImage);
 		           panel.repaint();
 		         }  
 			}
