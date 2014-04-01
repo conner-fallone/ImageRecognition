@@ -1,4 +1,5 @@
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
@@ -6,12 +7,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.Objdetect;
 import org.opencv.core.Size;
 
 /************************************************************
@@ -25,7 +26,6 @@ public class BallTracking {
 	public static void main(String[] args){
 		
 		// Variables
-		String videoPath = "C:\\Users\\Conner Fallone\\Documents\\GitHub\\ImageRecognition\\BallDetector\\cookie.avi";
 		Scalar redColor = new Scalar(0, 0, 255);
 		Size size = new Size(9,9);
 		
@@ -39,33 +39,35 @@ public class BallTracking {
 		JFrame frame = new JFrame("Object Detection");
 		
 		
-		// Swing Panel
-		CVPanel panel = new CVPanel();
-		CVPanel otherPanel = new CVPanel();
+		// Swing Panels
+		JPanel contentPane = new JPanel(new GridLayout(1,2));
+		CVPanel cameraPanel = new CVPanel();
+		CVPanel drawPanel = new CVPanel();
+		
+		// Add individual panels to contentpane
+		contentPane.add(cameraPanel);
+		contentPane.add(drawPanel);
 		
 		// Frame Properties
+		frame.setContentPane(contentPane);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		frame.setSize(400,400);
-		frame.setContentPane(panel);
+		frame.setSize(1366,600);
 		frame.setVisible(true);
 		
 		// Images to use
 		Mat videoImage = new Mat();
 		Mat grey = new Mat();
 		Mat circles = new Mat();
-		
-		// Stream from .avi
-		//VideoCapture stream = new VideoCapture();
-		//stream.open(videoPath);
+		Mat permanent = new Mat(480,640,CvType.CV_8UC3);
+		Mat permanentFlipped = new Mat();
 		
 		// Stream with webcam
 		VideoCapture stream = new VideoCapture(0);
 		
 		if (stream.isOpened()){
 			while (true){
-				stream.read(videoImage);		
+				stream.read(videoImage);
 				if(!videoImage.empty()){
-		           frame.setSize(videoImage.width()+40,videoImage.height()+60);
 		           
 		           // Convert to grayscale
 		           Imgproc.cvtColor(videoImage, grey, Imgproc.COLOR_RGB2GRAY);
@@ -88,16 +90,21 @@ public class BallTracking {
 		        	   
 		        	   // Draw the found circle
 		        	   Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
-		        	   
-		        	   
+		        	   	   
 		        	   // Draw the center of circle
-		        	   Core.circle(videoImage, center, 3, redColor, -1, 8, 0 );
+		        	   Core.circle(videoImage, center, 3, redColor, -1, 8, 0);
+		        	   Core.circle(permanent, center, 3, redColor, -1, 8, 0);
 		           }
 		           
-		           // Paint the image to the panel
+		           // Paint the webcam to the camera panel
 		           Core.flip(videoImage, videoImage, 1);
-		           panel.matToBufferedImage(videoImage);
-		           panel.repaint();
+		           cameraPanel.matToBufferedImage(videoImage);
+		           cameraPanel.repaint();
+		           
+		           // Paint the draw canvas to the draw panel
+		           Core.flip(permanent, permanentFlipped, 1);
+		           drawPanel.matToBufferedImage(permanentFlipped);
+		           drawPanel.repaint();
 		         }  
 			}
 		}
