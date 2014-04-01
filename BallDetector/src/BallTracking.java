@@ -11,6 +11,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.Objdetect;
 import org.opencv.core.Size;
 
 /************************************************************
@@ -24,9 +25,12 @@ public class BallTracking {
 	public static void main(String[] args){
 		
 		// Variables
-		String videoPath = "C:/Users/Conner Fallone/Documents/GitHub/ImageRecognition/BallDetector/ball.avi";
-		Scalar redColor = new Scalar(255, 0, 0);
+		String videoPath = "C:\\Users\\Conner Fallone\\Documents\\GitHub\\ImageRecognition\\BallDetector\\cookie.avi";
+		Scalar redColor = new Scalar(0, 0, 255);
 		Size size = new Size(9,9);
+		
+		// Lower threshold to detect circles more leniently
+		int threshold = 50;
 		
 		// Load library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -37,6 +41,7 @@ public class BallTracking {
 		
 		// Swing Panel
 		CVPanel panel = new CVPanel();
+		CVPanel otherPanel = new CVPanel();
 		
 		// Frame Properties
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -48,10 +53,10 @@ public class BallTracking {
 		Mat videoImage = new Mat();
 		Mat grey = new Mat();
 		Mat circles = new Mat();
-		Mat permanent = new Mat();
 		
 		// Stream from .avi
-		// VideoCapture stream = new VideoCapture();
+		//VideoCapture stream = new VideoCapture();
+		//stream.open(videoPath);
 		
 		// Stream with webcam
 		VideoCapture stream = new VideoCapture(0);
@@ -69,7 +74,7 @@ public class BallTracking {
 		           Imgproc.GaussianBlur(grey, grey, size, 2, 2 );
 		           
 		           // Apply Hough Circle Transform:
-		           Imgproc.HoughCircles(grey, circles, Imgproc.CV_HOUGH_GRADIENT, 1, grey.rows()/8, 200, 100, 0, 0 );
+		           Imgproc.HoughCircles(grey, circles, Imgproc.CV_HOUGH_GRADIENT, 1, grey.rows()/8, 200, threshold, 0, 0 );
 		           
 		           // Draw Circles
 		           for (int i = 0; i < Math.min(circles.cols(), 10); i++){
@@ -84,11 +89,13 @@ public class BallTracking {
 		        	   // Draw the found circle
 		        	   Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
 		        	   
+		        	   
 		        	   // Draw the center of circle
 		        	   Core.circle(videoImage, center, 3, redColor, -1, 8, 0 );
 		           }
 		           
 		           // Paint the image to the panel
+		           Core.flip(videoImage, videoImage, 1);
 		           panel.matToBufferedImage(videoImage);
 		           panel.repaint();
 		         }  
