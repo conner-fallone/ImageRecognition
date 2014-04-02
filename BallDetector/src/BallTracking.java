@@ -1,8 +1,12 @@
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -27,7 +31,9 @@ public class BallTracking {
 		
 		// Variables
 		Scalar redColor = new Scalar(0, 0, 255);
+		Scalar greenColor = new Scalar(0, 255, 0);
 		Size size = new Size(9,9);
+		final ArrayList<Point> pointHolder = new ArrayList<Point>();
 		
 		// Lower threshold to detect circles more leniently
 		int threshold = 50;
@@ -88,13 +94,19 @@ public class BallTracking {
 		        	   Point center = new Point(Math.round(vCircle[0]), Math.round(vCircle[1]));
 		        	   int radius = (int)Math.round(vCircle[2]);
 		        	   
-		        	   // Draw the found circle
+		        	   // Add the center point to our array list of centers
+		        	   pointHolder.add(center);
+		        	   
+		        	   
+		        	   // Draw the found circle on the webcam frame
 		        	   Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
-		        	   	   
-		        	   // Draw the center of circle
-		        	   Core.circle(videoImage, center, 3, redColor, -1, 8, 0);
-		        	   Core.circle(permanent, center, 3, redColor, -1, 8, 0);
 		           }
+		           
+		           // Loop through list of center points and draw all of them
+		           for (int j=0;j<pointHolder.size();j++){
+	        		   Core.circle(videoImage, pointHolder.get(j), 3, redColor, -1, 8, 0);
+	        		   Core.circle(permanent, pointHolder.get(j), 3, greenColor, -1, 8, 0);
+	        	   }
 		           
 		           // Paint the webcam to the camera panel
 		           Core.flip(videoImage, videoImage, 1);
