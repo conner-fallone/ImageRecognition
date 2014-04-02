@@ -1,13 +1,12 @@
+
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import org.opencv.core.Core;
@@ -30,8 +29,10 @@ public class BallTracking {
 	public static void main(String[] args){
 		
 		// Variables
+		JMenuBar menu = new JMenuBar();
 		Scalar redColor = new Scalar(0, 0, 255);
 		Scalar greenColor = new Scalar(0, 255, 0);
+		Scalar blackColor = new Scalar(0, 0, 0);
 		Size size = new Size(9,9);
 		final ArrayList<Point> pointHolder = new ArrayList<Point>();
 		
@@ -41,9 +42,8 @@ public class BallTracking {
 		// Load library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
-		// Swing Frame
+		// Swing Components
 		JFrame frame = new JFrame("Object Detection");
-		
 		
 		// Swing Panels
 		JPanel contentPane = new JPanel(new GridLayout(1,2));
@@ -56,6 +56,7 @@ public class BallTracking {
 		
 		// Frame Properties
 		frame.setContentPane(contentPane);
+		//frame.add(buttonPanel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		frame.setSize(1366,600);
 		frame.setVisible(true);
@@ -96,6 +97,12 @@ public class BallTracking {
 		        	   
 		        	   // Add the center point to our array list of centers
 		        	   pointHolder.add(center);
+		        	   
+		        	   // Limit the number of points to prevent memory leak (clear canvases)
+		        	   if (pointHolder.size() > 10000){
+		        		   pointHolder.clear();
+		        		   permanent.setTo(blackColor);
+		        	   }
 		        	   
 		        	   
 		        	   // Draw the found circle on the webcam frame
