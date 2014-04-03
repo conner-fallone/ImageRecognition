@@ -35,22 +35,22 @@ import org.opencv.core.Size;
  * is Hough Circle Transform.
  **************************************************************/
 public class BallTracking {
-	
+
 	public static void main(String[] args){
-		
+
 		// Variables
 		final Scalar redColor = new Scalar(0, 0, 255);
 		final Scalar greenColor = new Scalar(0, 255, 0);
 		final Scalar blackColor = new Scalar(0, 0, 0);
 		Size size = new Size(9,9);
 		final ArrayList<Point> pointHolder = new ArrayList<Point>();
-		
+
 		// Lower threshold to detect circles more leniently
 		int threshold = 50;
-		
+
 		// Load library
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		
+
 		// Swing Menu
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("File");
@@ -59,41 +59,41 @@ public class BallTracking {
 		menu.add(restart);
 		menu.add(exit);
 		menuBar.add(menu);
-		
+
 		// Swing Frame
 		JFrame frame = new JFrame("Object Detection");
 		frame.setJMenuBar(menuBar);
-		
+
 		// Swing Panels
 		JPanel contentPane = new JPanel(new GridLayout(1,2));
 		CVPanel cameraPanel = new CVPanel();
 		CVPanel drawPanel = new CVPanel();
-		
+
 		// Add individual panels to contentpane
 		contentPane.add(cameraPanel);
 		contentPane.add(drawPanel);
-		
+
 		// Frame Properties
 		frame.setContentPane(contentPane);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1366,600);
 		frame.setVisible(true);
-		
+
 		// Images to use
 		Mat videoImage = new Mat();
 		Mat grey = new Mat();
 		Mat circles = new Mat();
 		final Mat permanent = new Mat(480,640,CvType.CV_8UC3);
 		Mat permanentFlipped = new Mat();
-		
+
 		// Exit Menu Listener
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				
+
 				System.exit(0);
 			}
 		});
-		
+
 		// Restart Menu Listener
 		restart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -101,66 +101,66 @@ public class BallTracking {
 				permanent.setTo(blackColor);
 			}
 		});
-		
+
 		// Stream with webcam
 		VideoCapture stream = new VideoCapture(0);
-		
+
 		// Enter continuous loop for our stream
 		if (stream.isOpened()){
 			while (true){
 				stream.read(videoImage);
 				if(!videoImage.empty()){
-		           
-		           // Convert to grayscale
-		           Imgproc.cvtColor(videoImage, grey, Imgproc.COLOR_RGB2GRAY);
-		           
-		           // Apply a Gaussian blur to reduce noise and avoid false circle detection:
-		           Imgproc.GaussianBlur(grey, grey, size, 2, 2 );
-		           
-		           // Apply Hough Circle Transform:
-		           Imgproc.HoughCircles(grey, circles, Imgproc.CV_HOUGH_GRADIENT,
-		        		   1, grey.rows()/8, 200, threshold, 0, 0 );
-		           
-		           // Draw Circles
-		           for (int i = 0; i < Math.min(circles.cols(), 10); i++){
-		        	   
-		        	   double vCircle[] = circles.get(0,  i);
-		        	   
-		        	   if (vCircle == null)
-		        		   break;
-		        	   
-		        	   // Center point and radius of the detected circle(s)
-		        	   Point center = new Point(Math.round(vCircle[0]), Math.round(vCircle[1]));
-		        	   int radius = (int)Math.round(vCircle[2]);
-		        	   
-		        	   // Add the center point to our array list of center points
-		        	   pointHolder.add(center);
-		        	   
-		        	   // Limit the number of points to prevent memory leak (clear canvases)
-		        	   if (pointHolder.size() > 10000){
-		        		   pointHolder.clear();
-		        		   permanent.setTo(blackColor);
-		        	   }
-		        	   
-		        	   // Draw the found circle on the webcam frame
-		        	   Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
-		           }
-		           
-		           // Loop through list of center points and draw all of them
-		           for (int j=0;j<pointHolder.size();j++){
-	        		   Core.circle(videoImage, pointHolder.get(j), 3, redColor, -1, 8, 0);
-	        		   Core.circle(permanent, pointHolder.get(j), 3, greenColor, -1, 8, 0);
-	        	   }
-		           
-		           // Paint the webcam to the camera panel
-		           Core.flip(videoImage, videoImage, 1);
-		           cameraPanel.matToBufferedImage(videoImage);
-		           cameraPanel.repaint();
-		           
-		           // Paint the draw canvas to the draw panel
-		           Core.flip(permanent, permanentFlipped, 1);
-		           drawPanel.matToBufferedImage(permanentFlipped);
-		           drawPanel.repaint();
+
+					// Convert to grayscale
+					Imgproc.cvtColor(videoImage, grey, Imgproc.COLOR_RGB2GRAY);
+
+					// Apply a Gaussian blur to reduce noise and avoid false circle detection:
+					Imgproc.GaussianBlur(grey, grey, size, 2, 2 );
+
+					// Apply Hough Circle Transform:
+					Imgproc.HoughCircles(grey, circles, Imgproc.CV_HOUGH_GRADIENT,
+							1, grey.rows()/8, 200, threshold, 0, 0 );
+
+					// Draw Circles
+					for (int i = 0; i < Math.min(circles.cols(), 10); i++){
+
+						double vCircle[] = circles.get(0,  i);
+
+						if (vCircle == null)
+							break;
+
+						// Center point and radius of the detected circle(s)
+						Point center = new Point(Math.round(vCircle[0]), Math.round(vCircle[1]));
+						int radius = (int)Math.round(vCircle[2]);
+
+						// Add the center point to our array list of center points
+						pointHolder.add(center);
+
+						// Limit the number of points to prevent memory leak (clear canvases)
+						if (pointHolder.size() > 10000){
+							pointHolder.clear();
+							permanent.setTo(blackColor);
+						}
+
+						// Draw the found circle on the webcam frame
+						Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
+					}
+
+					// Loop through list of center points and draw all of them
+					for (int j=0;j<pointHolder.size();j++){
+						Core.circle(videoImage, pointHolder.get(j), 3, redColor, -1, 8, 0);
+						Core.circle(permanent, pointHolder.get(j), 3, greenColor, -1, 8, 0);
+					}
+
+					// Paint the webcam to the camera panel
+					Core.flip(videoImage, videoImage, 1);
+					cameraPanel.matToBufferedImage(videoImage);
+					cameraPanel.repaint();
+
+					// Paint the draw canvas to the draw panel
+					Core.flip(permanent, permanentFlipped, 1);
+					drawPanel.matToBufferedImage(permanentFlipped);
+					drawPanel.repaint();
 				}  
 			}
 		}
