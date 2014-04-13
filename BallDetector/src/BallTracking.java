@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
@@ -89,7 +90,6 @@ public class BallTracking {
 		// Exit Menu Listener
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-
 				System.exit(0);
 			}
 		});
@@ -143,7 +143,7 @@ public class BallTracking {
 						}
 
 						// Draw the found circle on the webcam frame
-						Core.circle(videoImage, center, radius, redColor, 3, 8, 0);
+						Core.circle(videoImage, center, radius, blackColor, 3, 8, 0);
 					}
 
 					// Loop through list of center points and draw all of them
