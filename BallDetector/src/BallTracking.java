@@ -1,19 +1,13 @@
 
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -37,6 +31,9 @@ import org.opencv.core.Size;
  **************************************************************/
 public class BallTracking {
 
+	// Boolean toggle for drawing lines
+	public static boolean drawLines = false;
+	
 	public static void main(String[] args){
 
 		// Variables
@@ -57,8 +54,10 @@ public class BallTracking {
 		JMenu menu = new JMenu("File");
 		JMenuItem restart = new JMenuItem("Restart");
 		JMenuItem exit = new JMenuItem("Exit");
+		JMenuItem points = new JMenuItem("Draw Lines");
 		menu.add(restart);
 		menu.add(exit);
+		menu.add(points);
 		menuBar.add(menu);
 
 		// Swing Frame
@@ -98,6 +97,15 @@ public class BallTracking {
 		restart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				pointHolder.clear();
+				permanent.setTo(blackColor);
+			}
+		});
+		
+		// Draw Lines Listener
+		points.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				// Toggle lines
+				drawLines = !drawLines;
 				permanent.setTo(blackColor);
 			}
 		});
@@ -150,6 +158,10 @@ public class BallTracking {
 					for (int j=0;j<pointHolder.size();j++){
 						Core.circle(videoImage, pointHolder.get(j), 3, redColor, -1, 8, 0);
 						Core.circle(permanent, pointHolder.get(j), 3, greenColor, -1, 8, 0);
+						if (j>1 && drawLines){
+							Core.line(videoImage, pointHolder.get(j), pointHolder.get(j-1), redColor, 3);
+							Core.line(permanent, pointHolder.get(j), pointHolder.get(j-1), greenColor, 3);
+						}
 					}
 
 					// Paint the webcam to the camera panel
